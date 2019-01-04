@@ -1,0 +1,214 @@
+这是数据库创建文件
+
+1 用户表
+CREATE TABLE  user_info_table (
+  userID int(11) NOT NULL auto_increment , 
+  user_name varchar(20) NOT NULL,
+  userIDCard varchar(20) NOT NULL,
+  login_name varchar(20) NOT NULL,
+  user_pwd varchar(32) NOT NULL,
+  user_type varchar(10) NOT NULL DEFAULT 'buyer' ,
+  server_bank varchar(20) default NULL,
+  user_property double default 0,
+  user_status int(2) default 1,
+  user_register_time datetime default CURRENT_TIMESTAMP,
+  others varchar(100),
+  PRIMARY KEY  (userID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+2 产品表
+CREATE TABLE  goods_info_table (
+  goodIncID int(11) NOT NULL auto_increment , 
+  good_name varchar(20) NOT NULL,
+  good_belonged_userID int(11)  NOT NULL,
+  good_belonged_bank VARCHAR(30) NOT NULL,
+  good_money_begin int(20) not null,
+  good_inc_money  int(20) not null,
+  good_income_rate  float not null,
+  good_date_begin date not null,
+  good_date_end date not null,
+  good_date_income date not null,
+  good_data_belong int(10) not null,
+  is_ok int(2) default 0,
+  count_have_sold  int(11) default 0,
+  good_others  varchar(50),
+  goodsInDate datetime default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (goodIncID),
+  constraint FK_sid foreign key(good_belonged_userID) references user_info_table(userID) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+3 抛售明细表
+CREATE TABLE  buyer_resell_table (
+  resell_id int(11) NOT NULL auto_increment , 
+  good_belonged_id int(11) NOT NULL,
+  user_belonged_id int(11)  NOT NULL,
+  have_bought_number int(11) NOT NULL,
+  apply_reason  varchar(20),
+  is_ok int(2) default 0,
+  is_sold  int(2) default 0,
+  apply_data datetime default CURRENT_TIMESTAMP,
+  is_resell int(2) default 1,
+  PRIMARY KEY  (resell_id),
+  constraint FK_good foreign key(good_belonged_id) references goods_info_table(goodIncID) ,
+  constraint FK_user foreign key(user_belonged_id) references user_info_table(userID) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+4 推荐显示视图
+
+
+视图测试心得。
+select * from table where `date`>CURRENT_DATE; 显示当前时间
+select * from goods_info_table where good_date_income < CURRENT_DATE and good_date_end < CURRENT_DATE   
+只显示没有失效的理财产品， 即收益期不小于今天，截止开放购买不小于今天。 必须用and 因为有一个条件不符合就显示。
+推荐上面显示已经过期的产品，会有转售的标志。
+
+1 这个可以进行显示需要的数据。
+select  goodIncID,good_name,good_belonged_bank,count_ha开放购买ve_sold,good_data_belong,good_income_rate,is_resell
+from goods_info_table as good LEFT JOIN buyer_resell_table as buyer on good.goodIncID = buyer.good_belonged_id where good.good_date_income > CURRENT_DATE ;
+
+2 实现外连接进行查询，不满足条件的也进行显示。 主要的作用就是因为转售表中只有一个产品ID，所以需要从商品表中进行查询。
+select  goodIncID,good_name,good_belonged_bank,count_have_sold,good_data_belong,good_income_rate,is_resell
+from goods_info_table as good LEFT JOIN buyer_resell_table as buyer on good.goodIncID = buyer.good_belonged_id   ;
+
+3 楼上二者进行相加即可 
+CREATE VIEW 
+v_recommend_view(goodIncID,good_name,good_belonged_bank,good_money_begin,good_inc_money,count_have_sold,good_date_belong,good_income_rate,is_resell )
+as 
+select  goodIncID,good_name,good_belonged_bank,good_money_begin,good_inc_money,count_have_sold,good_date_belong,good_income_rate,is_resell
+from goods_info_table as good LEFT JOIN buyer_resell_table as buyer on good.goodIncID = buyer.goodIncID where good.good_date_income > CURRENT_DATE or good.good_date_end > CURRENT_DATE order by count_have_sold desc;
+
+最终实现显示正确的数据。
+
+所以推荐表直接读取这个视图就行。
+
+5 交易明细表
+
+6 公司信息表。
+CREATE TABLE  company_info_table(
+  companyRegisterId int(11) NOT NULL,
+  companyName varchar(20) not null,
+  companyInstitutionalId int(11) NOT NULL,
+  comanyAddress varchar(40) not null,
+  companyTellNumber varchar(20) not null,
+  CompanyLicenseAddress  varchar(40) not null,
+  RegisterMoneny varchar(20) not null,
+  LegalPersonIDCard  varchar(20) not null,
+  LegalPersonName  varchar(20) not null,
+  moneybackCountType  varchar(20) not null,
+  moneybackCountNo varchar(20) not null,
+  createdtime datetime default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (companyRegisterId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+外键的名不能和已经建立的相同，就是说 所有的外键都是存储在一起的。
+
+select * from  goods_info_table where goodIncID in (select goodBelongedID from cart_info_table where userBelongedID = 100002)
+这是在购物车表中查询用户的购物车中的商品信息。
+ insertCompany_info_table: 	'insert into company_info_table(companyRegisterId,companyName ,companyInstitutionalId,comanyAddress,companyTellNumber,CompanyLicenseAddress,RegisterMoneny,LegalPersonIDCard,LegalPersonName,moneybackCountType,moneybackCountNo) values (?,?,?,?,?,?,?,?,?,?,?)',
+
+创建事件 也就是定时执行
+DROP EVENT IF EXISTS `event_minute`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` EVENT `event_day` ON SCHEDULE EVERY 1 DAY STARTS '2018-05-02 16:56:00' ON COMPLETION NOT PRESERVE ENABLE DO 
+
+BEGIN
+    INSERT INTO USER(name, address,addtime) VALUES('test1','test1',now());
+END
+;;
+DELIMITER ;
+
+
+6 订单表
+order_info_table 
+
+CREATE TABLE  order_info_table (
+  orderID int(11) NOT NULL auto_increment,
+  orderNo varchar(20) not null,
+  userID int(11) NOT NULL,
+  user_name varchar(20) not null,
+  userIDCard varchar(20) NOT NULL,
+  login_name varchar(20) NOT NULL,
+  userPhoneNumber varchar(20) NOT NULL,
+  goodIncID int(11) NOT NULL,
+  good_name varchar(20) not null,
+  good_belonged_bank VARCHAR(30) NOT NULL,
+  good_date_belong int(10) not null,
+  good_income_rate  float not null,
+  goodCnt int(20) NOT NULL,
+  goodIncomeNum float not null,
+  good_date_end date not null,
+  good_date_income date not null,
+  orderStatus int(2) default 1,
+  orderCreateTime datetime default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (orderID),
+  constraint FK_order_good foreign key(goodIncID) references goods_info_table(goodIncID),
+  constraint FK_order_user foreign key(userID) references user_info_table(userID) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+变量名的统一很重要啊。
+
+
+触发器 
+update goods_info_table set count_have_sold = count_have_sold + 1 , goodHaveSoldNum = goodHaveSoldNum + new.goodCnt where goodIncID = new.goodIncID and new.is_resell = 0;
+
+
+权限表 根据用户的权限进行动态的渲染输出。
+四种权限，权限表 默认都是为0 1 为有权限。
+
+1 人员管理 PersonManage
+2 产品管理 GoodsManage
+3 订单管理 OrderManage
+4 抛售管理 ResellManage
+
+CREATE TABLE  root_authority_table (
+  userID int(11) NOT NULL,
+  PersonManage int(2) not null default 0,
+  GoodsManage int(2) not null default 0,
+  OrderManage int(2) not null default 0,
+  ResellManage int(2) not null default 0,
+  PRIMARY KEY  (userID),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+写存储过程。
+1 到期自动下架的存储过程。
+BEGIN
+DECLARE date_good date; 
+DECLARE goodID int(11);
+DECLARE done INT DEFAULT 0; 
+declare cursor_goods_date_end CURSOR FOR select good_date_end,goodIncID from goods_info_table where goodStatus != -1 ;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+
+open cursor_goods_date_end;
+   goods_loop: LOOP  
+         FETCH cursor_goods_date_end INTO date_good,goodID;  
+         IF done=1 THEN  
+             LEAVE goods_loop;  
+         END IF;
+         IF date_good between '2018-01-01'  and CURDATE()  THEN  
+            update goods_info_table SET goodStatus = -1 where goodIncID = goodID;
+            select date_good;//调试存储过程直接可以进行输出。
+         END IF;
+     END LOOP goods_loop;
+close cursor_goods_date_end;
+END
+
+2 到期自动更改为可以清算的存储过程。
+BEGIN
+DECLARE date_order date; 
+DECLARE order_ID int(11);
+DECLARE done INT DEFAULT 0; 
+declare cursor_order_date_income CURSOR FOR select good_date_income,orderID from order_info_table where haveFinshed == 0 ;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+
+open cursor_order_date_income;
+   order_loop: LOOP  
+         FETCH cursor_order_date_income INTO date_order,order_ID;  
+         IF done=1 THEN  
+             LEAVE order_loop;  
+         END IF;
+         IF date_order between '2018-01-01'  and CURDATE()  THEN  
+            update order_info_table SET haveFinshed = 1 where orderID = order_ID;
+            select date_order;//调试存储过程直接可以进行输出。
+         END IF;
+     END LOOP order_loop;
+close cursor_order_date_income;
+END
