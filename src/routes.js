@@ -5,7 +5,7 @@ import Goods from './components/good_detail.vue'
 import Person from './components/person_detail.vue'
 import Checkout from './components/checkout.vue'
 import SellerRegister from './components/SellerRegister.vue'
-import Cart from './components/cart.vue'
+
 import OrderPage from './components/personpage/Orderpage.vue'
 import info from './components/personpage/info.vue'
 import Personinfo from './components/personpage/personinfo.vue'
@@ -48,10 +48,9 @@ let routes = [
                             {path: '/OrderPage', component: OrderPage, name: '查看订单',},
                             {path: '/Personinfo', component: Personinfo, name: '查看个人信息',},
                             {path: '/Resellpage', component: Resellpage, name: '转售操作',},
-                        ]},
+                        ]
+                    },
                     { path: '/Checkout', component: Checkout, name: '订单页面' },
-                    { path: '/Cart', component: Cart, name: '购物车页面' },
-                    // { path: '/SellerRegister', component: SellerRegister, name: '卖家注册' },
                 ]
     },
     {

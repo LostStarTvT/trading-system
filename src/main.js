@@ -9,8 +9,7 @@ import VueResource from 'vue-resource'
 import store from './vuex/store'
 import Vuex from 'vuex'
 import routes from './routes'
-import Mock from './mock'
-Mock.bootstrap();
+
 import scroll from 'vue-seamless-scroll';
 import 'font-awesome/css/font-awesome.min.css' //直接进行引用css框架。 所以要引入其他的直接加入就行 竟然有引入图标。
  //没有路径的都是直接用模块的引用
@@ -26,6 +25,8 @@ const router = new VueRouter({
   routes
 })
 
+//用户每次访问登录界面都会讲此时已经登录的用户删除
+//在访问home页面的时候，每次都会检测有没有用户已近登录。
 router.beforeEach((to,from,next)=>{ 
       if (to.path == '/login' || to.path == '/indexlogin') { 
         sessionStorage.removeItem('user');
