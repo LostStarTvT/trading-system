@@ -13,7 +13,7 @@
 ![买家界面](image/buyerpage.png)
 
 ###### 3.管理员和卖家登录界面
-![登录界面](image/root_login.png)
+![登录界面](image/rootlogin.png)
 
 ###### 4.管理员界面
 ![登录界面](image/rootpage.png)
