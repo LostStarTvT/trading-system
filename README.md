@@ -1,4 +1,8 @@
 # trading-system
+
+[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
+[![Badge](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu/#/zh_CN)
+
 使用**vue+element+express+mysql**实现一个简单交易系统,该系统拥有**买家系统、卖家系统、管理员系统**，模拟实现卖家上线商品、管理员审核商品，管理商品和用户、买家进行购买商品，系统自动的计算理财产品的收益和更新理财产品的状态。对于产品的推荐，由于能力有限，只是做了一些根据产品的信息计算得分，之后进行简单的排名显示给买家。由于时间仓促开发的不全面，只能作为一个学习的练手项目，可以学习一下vue、element和expres服务器。
 
 ### 项目说明
