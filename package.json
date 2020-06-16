@@ -9,7 +9,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "axios": "^0.15.3",
+    "axios": "^0.19.2",
     "connect-multiparty": "^2.1.0",
     "crypto": "^1.0.1",
     "echarts": "^3.3.2",
